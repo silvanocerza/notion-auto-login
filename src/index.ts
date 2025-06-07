@@ -2,6 +2,7 @@ import "dotenv/config";
 import UserAgent from "user-agents";
 import { chromium, Page } from "playwright";
 import { TOTP } from "totp-generator";
+import { mkdirSync, writeFileSync } from "node:fs";
 
 async function main() {
   if (!process.env.GOOGLE_MAIL) {
@@ -10,10 +11,8 @@ async function main() {
   if (!process.env.GOOGLE_PASSWORD) {
     throw Error("GOOGLE_PASSWORD env var not set");
   }
-  if (!process.env.GOOGLE_TOTP_SECRET) {
-    console.warn(
-      "GOOGLE_TOTP_SECRET env var not provided, login might fail if TOTP code is required",
-    );
+  if (!process.env.GOOGLE_TOTP_SECRET && !process.env.GOOGLE_TOTP) {
+    throw Error("GOOGLE_TOTP_SECRET and GOOGLE_TOTP env vars are both unset");
   }
 
   const browser = await chromium.launch({
@@ -47,7 +46,10 @@ async function main() {
     process.env.GOOGLE_PASSWORD,
   );
 
-  await page.waitForTimeout(20000);
+  const members = await getMembers(page);
+  mkdirSync("data/screenshots", { recursive: true });
+  writeFileSync("data/data.json", JSON.stringify(members));
+
   await browser.close();
 }
 
@@ -83,18 +85,114 @@ const loginWithGoogle = async (page: Page, mail: string, password: string) => {
     timeout: 10000,
   });
 
-  if (!process.env.GOOGLE_TOTP_SECRET) {
-    throw Error("Totp code is necessary but GOOGLE_TOTP_SECRET is not set");
+  let otp = "";
+  if (process.env.GOOGLE_TOTP) {
+    // If the TOTP is set explicitly use that
+    otp = process.env.GOOGLE_TOTP;
+  } else if (process.env.GOOGLE_TOTP_SECRET) {
+    // If the TOTP is not set use the provided TOTP secret to generate it
+    const res = TOTP.generate(process.env.GOOGLE_TOTP_SECRET);
+    otp = res.otp;
   }
-  const { otp } = TOTP.generate(process.env.GOOGLE_TOTP_SECRET);
   await page.fill('input[type="tel"]', otp);
   await page.click('button:has-text("Next")');
 };
 
-// Wait between 1 and 4 seconds, we don't want to interact to fast to avoid being recognized as bots
+// Wait between 1 and 4 seconds
 const waitSomeTime = async (page: Page) => {
   await page.waitForTimeout(Math.floor(Math.random() * 3000) + 1000);
 };
+
+const getMembers = async (page: Page) => {
+  page.waitForLoadState("domcontentloaded");
+  await page.getByText("Settings", { exact: true }).click();
+
+  await page.waitForSelector("#settings-tab-members", {
+    state: "visible",
+    timeout: 10000,
+  });
+  await page.click("#settings-tab-members");
+
+  // Just wait for everything to load
+  await waitSomeTime(page);
+  await page.getByText("Members", { exact: true }).click();
+
+  return extractAllMembers(page);
+};
+
+async function extractVisibleMembers(page: Page) {
+  const memberRows = page.locator(
+    '[style*="position: absolute"][style*="transform: translateY"]',
+  );
+
+  return await memberRows.evaluateAll((rows) => {
+    return rows
+      .map((row) => {
+        const nameDiv = row.querySelector(
+          'div[title][style*="font-weight: 510"]',
+        );
+        const name =
+          nameDiv?.getAttribute("title") || nameDiv?.textContent?.trim();
+
+        const emailDiv = row.querySelector(
+          'div[title][style*="color: rgb(115, 114, 110)"]',
+        );
+        const email =
+          emailDiv?.getAttribute("title") || emailDiv?.textContent?.trim();
+
+        const role = row.querySelector("span.notranslate")?.textContent?.trim();
+
+        return {
+          name,
+          email,
+          role,
+        };
+      })
+      .filter((member) => member.name);
+  });
+}
+
+async function extractAllMembers(page: Page) {
+  const members = [];
+  const seenEmails = new Set();
+  const virtualContainer = page.locator(
+    '[style*="flex: 1 1 0px; overflow: hidden auto"]',
+  );
+
+  let isAtBottom = false;
+  let index = 1;
+  while (!isAtBottom) {
+    // Extract current batch using your existing function
+    const currentMembers = await extractVisibleMembers(page);
+
+    // We wait for the UI to be fully loaded before taking a screenshot
+    // otherwise some user data might not load in time
+    await waitSomeTime(page);
+
+    virtualContainer.screenshot({
+      path: `data/screenshots/members_${index}.png`,
+    });
+
+    // Add new unique members
+    for (const member of currentMembers) {
+      if (member.email && !seenEmails.has(member.email)) {
+        seenEmails.add(member.email);
+        members.push(member);
+      }
+    }
+
+    // Check if at bottom and scroll
+    isAtBottom = await virtualContainer.evaluate((el) => {
+      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 10;
+      if (!atBottom) el.scrollTop += 500;
+      return atBottom;
+    });
+    await page.waitForTimeout(300);
+    index += 1;
+  }
+
+  return members;
+}
 
 main().catch((error) => {
   console.error(error);
