@@ -8,6 +8,14 @@ Install dependencies:
 pnpm install
 ```
 
+You might need to install the browsers too with:
+
+```
+pnpm exec playwright install
+# or with the flag to get their dependencies too
+pnpm exec playwright install --with deps
+```
+
 Build the project:
 
 ```
