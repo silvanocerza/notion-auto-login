@@ -1,0 +1,24 @@
+{
+  "name": "notion-auto-login",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx tsc",
+    "start": "node dist/index.js",
+    "dev": "NODE_ENV=development BROWSER_HEADLESS=false npm run build && npm run start",
+    "prod": "NODE_ENV=production BROWSER_HEADLESS=true npm run build && npm run start"
+  },
+  "keywords": [],
+  "author": "Silvano Cerza",
+  "license": "AGPL-3.0-only",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "playwright": "^1.52.0"
+  },
+  "devDependencies": {
+    "@types/dotenv": "^6.1.1",
+    "@types/node": "^22.15.30",
+    "typescript": "^5.8.3"
+  }
+}
