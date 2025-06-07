@@ -14,6 +14,12 @@ importers:
       playwright:
         specifier: ^1.52.0
         version: 1.52.0
+      totp-generator:
+        specifier: ^1.0.0
+        version: 1.0.0
+      user-agents:
+        specifier: ^1.1.563
+        version: 1.1.563
     devDependencies:
       '@types/dotenv':
         specifier: ^6.1.1
@@ -21,6 +27,9 @@ importers:
       '@types/node':
         specifier: ^22.15.30
         version: 22.15.30
+      '@types/user-agents':
+        specifier: ^1.0.4
+        version: 1.0.4
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -33,6 +42,9 @@ packages:
   '@types/node@22.15.30':
     resolution: {integrity: sha512-6Q7lr06bEHdlfplU6YRbgG1SFBdlsfNC4/lX+SkhiTs0cpJkOElmWls8PxDFv4yY/xKb8Y6SO0OmSX4wgqTZbA==}
 
+  '@types/user-agents@1.0.4':
+    resolution: {integrity: sha512-AjeFc4oX5WPPflgKfRWWJfkEk7Wu82fnj1rROPsiqFt6yElpdGFg8Srtm/4PU4rA9UiDUZlruGPgcwTMQlwq4w==}
+
   dotenv@16.5.0:
     resolution: {integrity: sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==}
     engines: {node: '>=12'}
@@ -41,6 +53,12 @@ packages:
     resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
+
+  jssha@3.3.1:
+    resolution: {integrity: sha512-VCMZj12FCFMQYcFLPRm/0lOBbLi8uM2BhXPTqw3U4YAfs4AZfiApOoBLoN8cQE60Z50m1MYMTQVCfgF/KaCVhQ==}
+
+  lodash.clonedeep@4.5.0:
+    resolution: {integrity: sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ==}
 
   playwright-core@1.52.0:
     resolution: {integrity: sha512-l2osTgLXSMeuLZOML9qYODUQoPPnUsKsb5/P6LJ2e6uPKXUdPK5WYhN4z03G+YNbWmGDY4YENauNu4ZKczreHg==}
@@ -52,6 +70,9 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
+  totp-generator@1.0.0:
+    resolution: {integrity: sha512-Iu/1Lk60/MH8FE+5cDWPiGbwKK1hxzSq+KT9oSqhZ1BEczGIKGcN50bP0WMLiIZKRg7t29iWLxw6f81TICQdoA==}
+
   typescript@5.8.3:
     resolution: {integrity: sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ==}
     engines: {node: '>=14.17'}
@@ -59,6 +80,9 @@ packages:
 
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
+
+  user-agents@1.1.563:
+    resolution: {integrity: sha512-uRTGakfsIHQoaOor64DZVijZcFITl2fTUj06FqiFtfDo/OCKL6U75lRwliFHlTMu4XP5t9lnDxxFlKWEJIh3RQ==}
 
 snapshots:
 
@@ -70,10 +94,16 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
+  '@types/user-agents@1.0.4': {}
+
   dotenv@16.5.0: {}
 
   fsevents@2.3.2:
     optional: true
+
+  jssha@3.3.1: {}
+
+  lodash.clonedeep@4.5.0: {}
 
   playwright-core@1.52.0: {}
 
@@ -83,6 +113,14 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.2
 
+  totp-generator@1.0.0:
+    dependencies:
+      jssha: 3.3.1
+
   typescript@5.8.3: {}
 
   undici-types@6.21.0: {}
+
+  user-agents@1.1.563:
+    dependencies:
+      lodash.clonedeep: 4.5.0

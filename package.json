@@ -14,11 +14,14 @@
   "description": "",
   "dependencies": {
     "dotenv": "^16.5.0",
-    "playwright": "^1.52.0"
+    "playwright": "^1.52.0",
+    "totp-generator": "^1.0.0",
+    "user-agents": "^1.1.563"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.1",
     "@types/node": "^22.15.30",
+    "@types/user-agents": "^1.0.4",
     "typescript": "^5.8.3"
   }
 }
