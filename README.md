@@ -1,3 +1,7 @@
+This project was a take home assignment done for [AccessOwl](https://www.accessowl.com/).
+
+I find take home assignment annoying for lots of reasons, I publish them when companies reject me to spread knowledge and cause I don't want well built projects to go to waste.
+
 # Notion auto login
 
 The project uses [`pnpm`](https://pnpm.io/) as package manager.
